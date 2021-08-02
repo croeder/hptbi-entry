@@ -15,7 +15,14 @@ fss_model <- function(data) {
 
   ##############################################################################
   # User code starts here
-  rtn <- lm(fss_total ~ age + female + icpyn1, data = data)
+  #rtn <- lm(fss_total ~ age + female + icpyn1, data = data)
+  #rtn <- lm(fss_total ~ age + female + icpyn1 + gcs_use + gcsed + gcsicu + decomcranyn, data = data)
+  #rtn <- lm(fss_total ~ age + female + icpyn1 + gcs_use + gcsed + decomcranyn, data = data)
+
+  rtn <- lm(fss_total ~ age + female + icpyn1 + decomcranyn, data = data)
+  #rtn <- lm(fss_total ~ age + female + icpyn1 + gcs_use, data = data)
+  #rtn <- lm(fss_total ~ age + female + icpyn1 + gcsed , data = data)
+  #rtn <- lm(fss_total ~ age + female + icpyn1 + gcsicu , data = data)
 
   # User code ends here
   ##############################################################################

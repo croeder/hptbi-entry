@@ -37,20 +37,86 @@ prepare_fss_data <- function(training = TRUE) {
   ##############################################################################
   # User Defined data preperation code starts here
 
+
   # deal with a possible missing value in icpyn1
   if (any(hackathon_fss_data$icpyn1)) {
-
     # if all information about type of monitor is missing then mark icpyn1 as 0
     flags <-
-      as.integer(!(
-                     hackathon_fss_data$icptype1 == "" | is.na(hackathon_fss_data$icptype1) &
-                     hackathon_fss_data$icptype2 == "" | is.na(hackathon_fss_data$icptype2) &
-                     hackathon_fss_data$icptype3 == "" | is.na(hackathon_fss_data$icptype3) 
-                  ))
+      as.integer( !( (hackathon_fss_data$icptype1 == "" | is.na(hackathon_fss_data$icptype1)) &
+                     (hackathon_fss_data$icptype2 == "" | is.na(hackathon_fss_data$icptype2)) &
+                     (hackathon_fss_data$icptype3 == "" | is.na(hackathon_fss_data$icptype3)) ))
 
     idx <- which(is.na(hackathon_fss_data$icpyn1))
     hackathon_fss_data$icpyn1[idx] <- flags[idx]
   }
+
+  # 3x GCS - ED
+  # ...gcseyeed
+  if (any(hackathon_fss_data$gcseyeed)) {
+    na_idx <- which(is.na(hackathon_fss_data$gcseyeed))
+    hackathon_fss_data$gcseyeed[na_idx] <- 1
+  }
+  # ...gcsverbaled
+  if (any(hackathon_fss_data$gcsverbaled)) {
+    na_idx <- which(is.na(hackathon_fss_data$gcsverbaled))
+    hackathon_fss_data$gcsverbaled[na_idx] <- 1
+  }
+  # ...gcsmotored
+  if (any(hackathon_fss_data$gcsmotored)) {
+    na_idx <- which(is.na(hackathon_fss_data$gcsmotored))
+    hackathon_fss_data$gcsmotored[na_idx] <- 1
+  }
+
+  # Deal with possible missing values in gcsed, after having corrected possible NAs in input.
+  #  sum gcseyeed + gcsverbaled + gcsmotored (from DD)
+  if (any(hackathon_fss_data$gcsed)) {
+    gcsed_values <-
+      hackathon_fss_data$gcseyeed  +
+      hackathon_fss_data$gcsverbaled +
+      hackathon_fss_data$gcsmotored 
+    na_idx <- which(is.na(hackathon_fss_data$gcsed))
+    hackathon_fss_data$gcsed[na_idx] <- gcsed_values[na_idx]
+  }
+
+  # 3x GCS - ICU
+  # ...gcseyeicu
+  if (any(hackathon_fss_data$gcseyeicu)) {
+    na_idx <- which(is.na(hackathon_fss_data$gcseyeicu))
+    hackathon_fss_data$gcseyeicu[na_idx] <- 1
+  }
+  # ...gcsverbalicu
+  if (any(hackathon_fss_data$gcsverbalicu)) {
+    na_idx <- which(is.na(hackathon_fss_data$gcsverbalicu))
+    hackathon_fss_data$gcsverbalicu[na_idx] <- 1
+  }
+  # ...gcsmotoricu
+  if (any(hackathon_fss_data$gcsmotoricu)) {
+    na_idx <- which(is.na(hackathon_fss_data$gcsmotoricu))
+    hackathon_fss_data$gcsmotoricu[na_idx] <- 1
+  }
+
+  # ...gcsicu
+  #  sum gcseyeicu + gcsverbalicu + gcsmotoricu (from DD)
+  if (any(hackathon_fss_data$gcsicu)) {
+    gcsicu_values <-
+      hackathon_fss_data$gcseyeicu  +
+      hackathon_fss_data$gcsverbalicu +
+      hackathon_fss_data$gcsmotoricu 
+    na_idx <- which(is.na(hackathon_fss_data$gcsicu))
+    hackathon_fss_data$gcsicu[na_idx] <- gcsicu_values[na_idx]
+  }
+
+  # ...decomcranyn
+  if (any(hackathon_fss_data$decomcranyn)) {
+    na_idx <- which(is.na(hackathon_fss_data$decomcranyn))
+    hackathon_fss_data$decomcranyn[na_idx] <- 1
+  }
+
+  # derive this value only once the inputs are fixed
+  hackathon_fss_data$gcs_use <-
+    ifelse(is.na(hackathon_fss_data$gcsed),
+           yes = hackathon_fss_data$gcsicu,
+           no  = hackathon_fss_data$gcsed)
 
   # User Defined Code ends here
   ##############################################################################
