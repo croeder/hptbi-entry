@@ -50,11 +50,31 @@ prepare_mortality_data <- function(training = TRUE) {
     hackathon_mortality_data$icpyn1[idx] <- flags[idx]
   }
 
-  # Deal with possible missing values in gcsed.
-  #  DD mentions gcseyeed + gcsverbaled + gcsmotored.  # This round proclaim ignorance.
+  # ...gcseyeed
+  if (any(hackathon_mortality_data$gcseyeed)) {
+    na_idx <- which(is.na(hackathon_mortality_data$gcseyeed))
+    hackathon_mortality_data$gcseyeed[na_idx] <- 0
+  }
+  # ...gcsverbaled
+  if (any(hackathon_mortality_data$gcsverbaled)) {
+    na_idx <- which(is.na(hackathon_mortality_data$gcsverbaled))
+    hackathon_mortality_data$gcsverbaled[na_idx] <- 0
+  }
+  # ...gcsmotored
+  if (any(hackathon_mortality_data$gcsmotored)) {
+    na_idx <- which(is.na(hackathon_mortality_data$gcsmotored))
+    hackathon_mortality_data$gcsmotored[na_idx] <- 0
+  }
+
+  # Deal with possible missing values in gcsed, after having corrected possible NAs in input.
+  #  sum gcseyeed + gcsverbaled + gcsmotored (from DD)
   if (any(hackathon_mortality_data$gcsed)) {
+    gcsed_values <-
+      hackathon_mortality_data$gcseyeed  +
+      hackathon_mortality_data$gcsverbaled +
+      hackathon_mortality_data$gcsmotored 
     na_idx <- which(is.na(hackathon_mortality_data$gcsed))
-    hackathon_mortality_data$gcsed[na_idx] <- 0
+    hackathon_mortality_data$gcsed[na_idx] <- gcsed_values[na_idx]
   }
 
   # ...decomcranyn
