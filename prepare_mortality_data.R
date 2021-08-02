@@ -50,6 +50,7 @@ prepare_mortality_data <- function(training = TRUE) {
     hackathon_mortality_data$icpyn1[idx] <- flags[idx]
   }
 
+  # 3x GCS - ED
   # ...gcseyeed
   if (any(hackathon_mortality_data$gcseyeed)) {
     na_idx <- which(is.na(hackathon_mortality_data$gcseyeed))
@@ -77,19 +78,39 @@ prepare_mortality_data <- function(training = TRUE) {
     hackathon_mortality_data$gcsed[na_idx] <- gcsed_values[na_idx]
   }
 
+  # 3x GCS - ICU
+  # ...gcseyeicu
+  if (any(hackathon_mortality_data$gcseyeicu)) {
+    na_idx <- which(is.na(hackathon_mortality_data$gcseyeicu))
+    hackathon_mortality_data$gcseyeicu[na_idx] <- 0
+  }
+  # ...gcsverbalicu
+  if (any(hackathon_mortality_data$gcsverbalicu)) {
+    na_idx <- which(is.na(hackathon_mortality_data$gcsverbalicu))
+    hackathon_mortality_data$gcsverbalicu[na_idx] <- 0
+  }
+  # ...gcsmotoricu
+  if (any(hackathon_mortality_data$gcsmotoricu)) {
+    na_idx <- which(is.na(hackathon_mortality_data$gcsmotoricu))
+    hackathon_mortality_data$gcsmotoricu[na_idx] <- 0
+  }
+
+  # ...gcsicu
+  #  sum gcseyeicu + gcsverbalicu + gcsmotoricu (from DD)
+  if (any(hackathon_mortality_data$gcsicu)) {
+    gcsicu_values <-
+      hackathon_mortality_data$gcseyeicu  +
+      hackathon_mortality_data$gcsverbalicu +
+      hackathon_mortality_data$gcsmotoricu 
+    na_idx <- which(is.na(hackathon_mortality_data$gcsicu))
+    hackathon_mortality_data$gcsicu[na_idx] <- gcsicu_values[na_idx]
+  }
+
   # ...decomcranyn
   if (any(hackathon_mortality_data$decomcranyn)) {
     na_idx <- which(is.na(hackathon_mortality_data$decomcranyn))
     hackathon_mortality_data$decomcranyn[na_idx] <- 0
   }
-
-  # ...gcsicu
-  #  DD mentions gcseyecu + gcsverbalicu + gcsmotoricu.  # This round proclaim ignorance.
-  if (any(hackathon_mortality_data$gcsicu)) {
-    na_idx <- which(is.na(hackathon_mortality_data$gcsicu))
-    hackathon_mortality_data$gcsicu[na_idx] <- 0
-  }
-
 
   # derive this value only once the inputs are fixed
   hackathon_mortality_data$gcs_use <-
