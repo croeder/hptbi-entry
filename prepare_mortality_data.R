@@ -37,28 +37,46 @@ prepare_mortality_data <- function(training = TRUE) {
   ##############################################################################
   # User Defined Code starts here
 
+
+  # deal with a possible missing value in icpyn1
+  if (any(hackathon_mortality_data$icpyn1)) {
+    # if all information about type of monitor is missing then mark icpyn1 as 0
+    flags <-
+      as.integer( !( (hackathon_mortality_data$icptype1 == "" | is.na(hackathon_mortality_data$icptype1)) &
+                     (hackathon_mortality_data$icptype2 == "" | is.na(hackathon_mortality_data$icptype2)) &
+                     (hackathon_mortality_data$icptype3 == "" | is.na(hackathon_mortality_data$icptype3)) ))
+
+    idx <- which(is.na(hackathon_mortality_data$icpyn1))
+    hackathon_mortality_data$icpyn1[idx] <- flags[idx]
+  }
+
+  # Deal with possible missing values in gcsed.
+  #  DD mentions gcseyeed + gcsverbaled + gcsmotored.  # This round proclaim ignorance.
+  if (any(hackathon_mortality_data$gcsed)) {
+    na_idx <- which(is.na(hackathon_mortality_data$gcsed))
+    hackathon_mortality_data$gcsed[na_idx] <- 0
+  }
+
+  # ...decomcranyn
+  if (any(hackathon_mortality_data$decomcranyn)) {
+    na_idx <- which(is.na(hackathon_mortality_data$decomcranyn))
+    hackathon_mortality_data$decomcranyn[na_idx] <- 0
+  }
+
+  # ...gcsicu
+  #  DD mentions gcseyecu + gcsverbalicu + gcsmotoricu.  # This round proclaim ignorance.
+  if (any(hackathon_mortality_data$gcsicu)) {
+    na_idx <- which(is.na(hackathon_mortality_data$gcsicu))
+    hackathon_mortality_data$gcsicu[na_idx] <- 0
+  }
+
+
+  # derive this value only once the inputs are fixed
   hackathon_mortality_data$gcs_use <-
     ifelse(is.na(hackathon_mortality_data$gcsed),
            yes = hackathon_mortality_data$gcsicu,
            no  = hackathon_mortality_data$gcsed)
 
-
-  # deal with a possible missing value in icpyn1
-  if (any(hackathon_mortality_data$icpyn1)) {
-
-    # if all information about type of monitor is missing then mark icpyn1 as 0
-    flags <-
-      as.integer(
-                 !(
-                     (hackathon_mortality_data$icptype1 == "" | is.na(hackathon_mortality_data$icptype1)) &
-                     (hackathon_mortality_data$icptype2 == "" | is.na(hackathon_mortality_data$icptype2)) &
-                     (hackathon_mortality_data$icptype3 == "" | is.na(hackathon_mortality_data$icptype3)) 
-                  )
-      )
-
-    idx <- which(is.na(hackathon_mortality_data$icpyn1))
-    hackathon_mortality_data$icpyn1[idx] <- flags[idx]
-  }
   
 
   # User Defined Code ends here
