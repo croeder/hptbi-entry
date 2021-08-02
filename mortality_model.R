@@ -15,8 +15,12 @@ mortality_model <- function(data) {
 
   ##############################################################################
   # User code starts here
-  rtn <-
-    glm(mortality ~ age + female + gcs_use + icpyn1,
+    #rtn 
+    # <-glm(mortality ~ age + female + gcs_use + icpyn1, # original: 0.553, 0.802
+    #    data = data,
+    #    family = binomial())
+
+    rtn <- glm(mortality ~ age + female + gcs_use + icpyn1  + gcsed + decomcranyn,  # 0.574/0.810
         data = data,
         family = binomial())
   

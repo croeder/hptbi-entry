@@ -1,14 +1,11 @@
-title: "Your Hackathon Project Title"
+title: "Chris Roeders' HPTBI Hackathon Project"
 version: v0.1
 language: R
 author:
-- name: Peter E. DeWitt
-  email: peter.dewitt@cuanschutz.edu
-  github: dewittpe
-- name: Author Two
-  email: author.two@school.edu
-  github: author2
+- name:  Chris Roeder
+  email: croeder@croeder.com  
+  github: croeder
 description: >
   This is where you can write a few sentences about your submission.  Modeling
   approach, author contributions, etc.
-url: https://github.com/dewittpe/hackathon
+url: https://github.com/croeder/hptbi-entry
