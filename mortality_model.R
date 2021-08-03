@@ -20,7 +20,9 @@ mortality_model <- function(data) {
     #    data = data,
     #    family = binomial())
 
-    rtn <- glm(mortality ~ age + female + gcs_use + icpyn1  + gcsed + decomcranyn,  # 0.574/0.810
+    rtn <- glm(mortality ~ age + female + gcs_use + icpyn1  + gcsed + decomcranyn +
+                           cardiacarrested + cardiacarrestor + cardiacarrestprehosp + 
+			   cardiacarrestyn + cardiacarresticu + cardiacarrestother , 
         data = data,
         family = binomial())
   
