@@ -12,6 +12,106 @@
 #   A data.frame with the defined primary outcome and any user specific
 #   elements needed for training and testing their model.
 #
+
+user_prepare_mortality_data <- function(df) {
+
+  # deal with a possible missing value in icpyn1
+  if (any(df$icpyn1)) {
+    # if all information about type of monitor is missing then mark icpyn1 as 0
+    flags <- as.integer( !( (df$icptype1 == "" | is.na(df$icptype1)) &
+                          (df$icptype2 == "" | is.na(df$icptype2)) &
+                          (df$icptype3 == "" | is.na(df$icptype3)) ))
+
+    idx <- which(is.na(df$icpyn1))
+    df$icpyn1[idx] <- flags[idx]
+  }
+
+  # missing values in 3 GCS-ED fields
+  # gcseyeed
+  if (any(df$gcseyeed)) {
+    na_idx <- which(is.na(df$gcseyeed))
+    df$gcseyeed[na_idx] <- 0
+  }
+  # gcsverbaled
+  if (any(df$gcsverbaled)) {
+    na_idx <- which(is.na(df$gcsverbaled))
+    df$gcsverbaled[na_idx] <- 0
+  }
+  # gcsmotored
+  if (any(df$gcsmotored)) {
+    na_idx <- which(is.na(df$gcsmotored))
+    df$gcsmotored[na_idx] <- 0
+  }
+
+  # Deal with possible missing values in gcsed, after having corrected possible NAs in input.
+  #  sum gcseyeed + gcsverbaled + gcsmotored (from DD)
+  if (any(df$gcsed)) {
+    gcsed_values <-
+      df$gcseyeed  +
+      df$gcsverbaled +
+      df$gcsmotored 
+    na_idx <- which(is.na(df$gcsed))
+    df$gcsed[na_idx] <- gcsed_values[na_idx]
+  }
+
+  # GCS-ICU
+  # ...gcseyeicu
+  if (any(df$gcseyeicu)) {
+    na_idx <- which(is.na(df$gcseyeicu))
+    df$gcseyeicu[na_idx] <- 0
+  }
+  # gcsverbalicu
+  if (any(df$gcsverbalicu)) {
+    na_idx <- which(is.na(df$gcsverbalicu))
+    df$gcsverbalicu[na_idx] <- 0
+  }
+  # gcsmotoricu
+  if (any(df$gcsmotoricu)) {
+    na_idx <- which(is.na(df$gcsmotoricu))
+    df$gcsmotoricu[na_idx] <- 0
+  }
+
+  # gcsicu
+  #  sum gcseyeicu + gcsverbalicu + gcsmotoricu (from DD)
+  if (any(df$gcsicu)) {
+    gcsicu_values <-
+      df$gcseyeicu  +
+      df$gcsverbalicu +
+      df$gcsmotoricu 
+    na_idx <- which(is.na(df$gcsicu))
+    df$gcsicu[na_idx] <- gcsicu_values[na_idx]
+  }
+
+  # decomcranyn
+  if (any(df$decomcranyn)) {
+    na_idx <- which(is.na(df$decomcranyn))
+    df$decomcranyn[na_idx] <- 0
+  }
+
+  # derive this value only once the inputs are fixed
+  df$gcs_use <- ifelse(is.na(df$gcsed),
+                    yes = df$gcsicu,
+                    no  = df$gcsed)
+
+    df
+}
+
+organizer_prepare_mortality_data <- function(hackathon_mortality_data) {
+  # Define the primary outcome
+  hackathon_mortality_data$mortality <-
+    as.integer(hackathon_mortality_data$hospdisposition == "Mortality")
+
+  # Omit FSS elements - FSS is omitted from this data set.  FSS could not be
+  # assessed for patients who died.  To reduce confusion FSS related elements
+  # are omitted as missing values for FSS are be highly correlated with
+  # mortality.
+  hackathon_mortality_data <-
+    hackathon_mortality_data[-grep("fss", names(hackathon_mortality_data))]
+
+  return(hackathon_mortality_data)
+}
+
+# This reads and prepares the model with the hackathon organizer's code
 prepare_mortality_data <- function(training = TRUE) {
 
   # import the data set
@@ -21,109 +121,8 @@ prepare_mortality_data <- function(training = TRUE) {
     hackathon_mortality_data <- read.csv(file = "./csvs/training.csv")
   }
 
-  # Define the primary outcome -- do not edit this.  If you need the outcome in
-  # a different format, e.g., integer or logical, create an additional
-  # data.frame element in user defined code section below.
-  hackathon_mortality_data$mortality <-
-    as.integer(hackathon_mortality_data$hospdisposition == "Mortality")
-
-  # Omit some elements - FSS is omitted from this data set.  FSS could not be
-  # assessed for patients who died.  To reduce confusion FSS related elements
-  # are omitted as missing values for FSS are be highly correlated with
-  # mortality.
-  hackathon_mortality_data <-
-    hackathon_mortality_data[-grep("fss", names(hackathon_mortality_data))]
-
-  ##############################################################################
-  # User Defined Code starts here
-
-
-  # deal with a possible missing value in icpyn1
-  if (any(hackathon_mortality_data$icpyn1)) {
-    # if all information about type of monitor is missing then mark icpyn1 as 0
-    flags <-
-      as.integer( !( (hackathon_mortality_data$icptype1 == "" | is.na(hackathon_mortality_data$icptype1)) &
-                     (hackathon_mortality_data$icptype2 == "" | is.na(hackathon_mortality_data$icptype2)) &
-                     (hackathon_mortality_data$icptype3 == "" | is.na(hackathon_mortality_data$icptype3)) ))
-
-    idx <- which(is.na(hackathon_mortality_data$icpyn1))
-    hackathon_mortality_data$icpyn1[idx] <- flags[idx]
-  }
-
-  # 3x GCS - ED
-  # ...gcseyeed
-  if (any(hackathon_mortality_data$gcseyeed)) {
-    na_idx <- which(is.na(hackathon_mortality_data$gcseyeed))
-    hackathon_mortality_data$gcseyeed[na_idx] <- 0
-  }
-  # ...gcsverbaled
-  if (any(hackathon_mortality_data$gcsverbaled)) {
-    na_idx <- which(is.na(hackathon_mortality_data$gcsverbaled))
-    hackathon_mortality_data$gcsverbaled[na_idx] <- 0
-  }
-  # ...gcsmotored
-  if (any(hackathon_mortality_data$gcsmotored)) {
-    na_idx <- which(is.na(hackathon_mortality_data$gcsmotored))
-    hackathon_mortality_data$gcsmotored[na_idx] <- 0
-  }
-
-  # Deal with possible missing values in gcsed, after having corrected possible NAs in input.
-  #  sum gcseyeed + gcsverbaled + gcsmotored (from DD)
-  if (any(hackathon_mortality_data$gcsed)) {
-    gcsed_values <-
-      hackathon_mortality_data$gcseyeed  +
-      hackathon_mortality_data$gcsverbaled +
-      hackathon_mortality_data$gcsmotored 
-    na_idx <- which(is.na(hackathon_mortality_data$gcsed))
-    hackathon_mortality_data$gcsed[na_idx] <- gcsed_values[na_idx]
-  }
-
-  # 3x GCS - ICU
-  # ...gcseyeicu
-  if (any(hackathon_mortality_data$gcseyeicu)) {
-    na_idx <- which(is.na(hackathon_mortality_data$gcseyeicu))
-    hackathon_mortality_data$gcseyeicu[na_idx] <- 0
-  }
-  # ...gcsverbalicu
-  if (any(hackathon_mortality_data$gcsverbalicu)) {
-    na_idx <- which(is.na(hackathon_mortality_data$gcsverbalicu))
-    hackathon_mortality_data$gcsverbalicu[na_idx] <- 0
-  }
-  # ...gcsmotoricu
-  if (any(hackathon_mortality_data$gcsmotoricu)) {
-    na_idx <- which(is.na(hackathon_mortality_data$gcsmotoricu))
-    hackathon_mortality_data$gcsmotoricu[na_idx] <- 0
-  }
-
-  # ...gcsicu
-  #  sum gcseyeicu + gcsverbalicu + gcsmotoricu (from DD)
-  if (any(hackathon_mortality_data$gcsicu)) {
-    gcsicu_values <-
-      hackathon_mortality_data$gcseyeicu  +
-      hackathon_mortality_data$gcsverbalicu +
-      hackathon_mortality_data$gcsmotoricu 
-    na_idx <- which(is.na(hackathon_mortality_data$gcsicu))
-    hackathon_mortality_data$gcsicu[na_idx] <- gcsicu_values[na_idx]
-  }
-
-  # ...decomcranyn
-  if (any(hackathon_mortality_data$decomcranyn)) {
-    na_idx <- which(is.na(hackathon_mortality_data$decomcranyn))
-    hackathon_mortality_data$decomcranyn[na_idx] <- 0
-  }
-
-  # derive this value only once the inputs are fixed
-  hackathon_mortality_data$gcs_use <-
-    ifelse(is.na(hackathon_mortality_data$gcsed),
-           yes = hackathon_mortality_data$gcsicu,
-           no  = hackathon_mortality_data$gcsed)
-
-  
-
-  # User Defined Code ends here
-  ##############################################################################
-
-  hackathon_mortality_data
+  hackathon_mortality_data <- organizer_prepare_mortality_data(hackathon_mortality_data)
+  user_prepare_mortality_data(hackathon_mortality_data)
 }
 
 ################################################################################

@@ -1,0 +1,32 @@
+---
+title: "HPTBI Mortality"
+output: html_notebook
+---
+
+
+```{r}
+setwd("/Users/croeder/git/hptbi-entry")
+source("prepare_mortality_data.R")
+source("mortality_model.R")
+df <- read.csv("csvs/training.csv")
+df <- organizer_prepare_mortality_data(df)
+df <- user_prepare_mortality_data(df)
+glm_model <- user_mortality_model(df)
+
+df$mortality_prediction <-  predict(glm_model, newdata = df, type="response")
+
+
+plot(df$mortality ~ df$age, col = "red4", xlab = 'age', ylab = 'mortality')
+points(df$mortality_prediction ~ df$age, col = "blue", xlab = 'age', ylab = 'mortality')
+#lines(df$mortality_prediction ~ df$age, col = "blue", xlab = 'age', ylab = 'mortality')
+
+plot(df$mortality ~ df$female, col = "red4", xlab = 'female', ylab = 'mortality')
+points(df$mortality_prediction ~ df$female, col = "pink")
+
+plot(df$mortality ~ df$gcs_use, col = "red4", xlab = 'gcs_use', ylab = 'mortality')
+points(df$mortality_prediction ~ df$gcs_use, col = "green")
+
+plot(df$mortality ~ df$icpyn1, col = "red4", xlab = 'icpyn1', ylab = 'mortality')
+points(df$mortality_prediction ~ df$icpyn1, col = "purple")
+
+```

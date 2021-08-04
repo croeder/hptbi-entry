@@ -1,5 +1,19 @@
 ################################################################################
+# User Mortality Model
+# user model function, returns the model
+# Args:
+#   data a data.frame resulting from a call to prepare_mortality_data()
+# Return:
+#   a model
 #
+user_mortality_model <- function(data) {
+    glm(mortality ~ age + female + gcs_use + icpyn1  + gcsed + decomcranyn +
+                           cardiacarrested + cardiacarrestor + cardiacarrestprehosp +
+			               cardiacarrestyn + cardiacarresticu + cardiacarrestother,
+        data = data,
+        family = binomial())
+}
+
 ################################################################################
 # Mortality Model
 #
@@ -12,23 +26,7 @@
 #   predictions from the training and testing data sets.
 #
 mortality_model <- function(data) {
-
-  ##############################################################################
-  # User code starts here
-    #rtn 
-    # <-glm(mortality ~ age + female + gcs_use + icpyn1, # original: 0.553, 0.802
-    #    data = data,
-    #    family = binomial())
-
-    rtn <- glm(mortality ~ age + female + gcs_use + icpyn1  + gcsed + decomcranyn +
-                           cardiacarrested + cardiacarrestor + cardiacarrestprehosp + 
-			   cardiacarrestyn + cardiacarresticu + cardiacarrestother , 
-        data = data,
-        family = binomial())
-  
-  # User code ends here
-  ##############################################################################
-
+  rtn <- user_mortality_model(data)
   class(rtn) <- c("hackathon_mortality_model", class(rtn))
   rtn
 }
