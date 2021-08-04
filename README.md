@@ -1,5 +1,8 @@
 # Harmonized Pediatric Traumatic Brain Injury Hackathon
 
+## Warning to potential cheaters
+I'm not a statistician. There are verly likely real pros working on this whose work will help rather than hinder you.
+
 ## Objectives for the Hackathon
 
 Develop models for predicting
