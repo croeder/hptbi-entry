@@ -1,11 +1,10 @@
 title: "Chris Roeders' HPTBI Hackathon Project"
-version: v0.5
+version: v1.0
 language: R
 author:
 - name:  Chris Roeder
   email: croeder@croeder.com  
   github: croeder
 description: >
-  This is where you can write a few sentences about your submission.  Modeling
-  approach, author contributions, etc.
+I am not a statistician.
 url: https://github.com/croeder/hptbi-entry
